@@ -34,7 +34,8 @@ editor: source
 # Clear memory
 rm(list = ls()); gc()
 
-library(mgcv)
+library(gtools)
+library(broom)
 library(tidyverse)
 library(magrittr)
 library(janitor)
@@ -69,7 +70,7 @@ We read in the data and column names files, then use the column names file to id
 * Median value of owner-occupied household units
 * Median rent
 
-These fields all looked relevant to employment, and therefore commute time, while also being relatively interpretable.
+These fields all looked relevant to employment, and therefore commute time, while also being relatively interpretable. We also keep total counts that will allow us to compute weighted averages across counties when we analyze the data. However, for all fields, we exclude "margin of error" calculations for our analysis.
 
 After cleaning the data, we save an intermediate cleaned file in the data folder.
 

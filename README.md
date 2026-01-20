@@ -1,29 +1,24 @@
 # bios731_hw1_taylor
 
-## Generic Project Directory
+## BIOS 731 Homework 1 Project Directory
 
-This is a generic project template. It might help to add a brief description.
+This project is set up as a reproducible workflow for BIOS 731 Homework 1. 
 
-When the project has been created, I recommend running
-
-```usethis::use_github(private = TRUE, protocol = "https")```
-
-to create a private remote repo corresponding to this project. If this project
-is edited across multiple machines, it may be necessary to add symbolic links
-to data directories using
-
-```ln -s PATH/TO/DATA data```
+The analysis uses Census American Community Survey (ACS) data at the county level to find associations between selected county demographics and average commute time.
 
 ## Structure
 
-* `analysis/` is intended to contain all the source R Markdown files that
-implement the analyses for the project.
-* `data/` will either be a symbolic link to an external data directory, or
-a subdirectory
-* `drafts/` will contain relevant paper drafts
-* `literature/` will contain all references
-* `results/` will contain results exported by the analysis files
-* `source/` will contain bare scripts (typically containing functions sourced
-by the full analysis files)
+* `analysis/` contains the R Markdown files that implement and report the analyses for the project.
+* `data/` is a subdirectory containing the raw and cleaned data
+* `drafts/` could contain relevant paper drafts, but is empty in this analysis
+* `literature/` could contain all references, but is also empty
+* `results/` contains results exported by the analysis files
+* `source/` contains bare scripts that perform the analysis, but do not report results
 
-project structured using the [projectr](https://github.com/julia-wrobel/projectr) package.
+*project structured using the [projectr](https://github.com/julia-wrobel/projectr) package.*
+
+## Files
+
+### Data
+
+The data folder includes a folder

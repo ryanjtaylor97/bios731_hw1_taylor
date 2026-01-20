@@ -1,0 +1,86 @@
+---
+title: "BIOS 731 Homework 1 Commute Analysis"
+format: 
+  html:
+    toc: true
+    toc-depth: 2
+    toc-title: Contents
+    toc-location: left
+    df-print: kable
+    theme: sandstone
+    highlight: haddock
+    code-fold: true
+    code-overflow: wrap
+    knitr:
+      opts_chunk:
+        echo: true,
+        include: true
+        message: false,
+        warning: false
+        results: markup
+        fig.align: center
+        fig.height: 5
+        fig.width: 7
+        R.options:
+          scipen: 999
+          knitr.kable.NA: ""
+editor: source
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Clear memory
+rm(list = ls()); gc()
+
+library(mgcv)
+library(tidyverse)
+library(magrittr)
+library(janitor)
+library(knitr)
+library(here)
+```
+
+# Overview
+
+This document runs a reproducible analysis for BIOS 731 Homework 1. We download data from the American Community Survey S0201 table at [data.census.gov] <https://data.census.gov/table/ACSSPP1Y2024.S0201?t=Commuting:Education&g=010XX00US$0500000&moe=false&tp=true&tableFilters=ag-Grid-AutoColumn~(Margin+of+Errorundefined)>. This table provides county-level demographics for a selection of counties across the United States, including information such as total population, total population with a disability, median household income, and average commute time to work. 
+
+We are interested in the demographics that may be associated with average commute time, since there are likely a wide variety of factors that may govern this part of county residents' lives. To explore this, we select a subset of fields from this table and run regressions to identify meaningful associations.
+
+# Load Data
+
+First, we download data from the American Community Survey. After navigating to the S0201 table, we download the 2024 data as a zip file. This provides one csv file (with the suffix "-Data") containing the data for each county, one csv file (with the suffix "-Column-Names") containing a key translating from the column names in this data file to column descriptions, and a text file (with the suffix "-Table-Notes") providing more information on how the data were collected.
+
+We read in the data and column names files, then use the column names file to identify a subset of fields in the data file we will keep. Specifically, we choose to keep:
+
+* Total Population
+* Average Household Size
+* Percent of population 25 and over with educated high school degree or greater
+* Percent of population 25 and over educated with Bachelor's degree or greater
+* Percent of civilian noninstitutionalized population with a disability
+* Average commute time (in minutes)
+* Percent of civilian employed population 16 and over who are employed as private wage and salary workers
+* Percent of civilian employed population 16 and over who are employed as government workers
+* Percent of civilian employed population 16 and over who are employed as self-employed workers
+* Percent of civilian employed population 16 and over who are employed as unpaid family workers
+* Median household income
+* Median individual per capita income
+* Median value of owner-occupied household units
+* Median rent
+
+These fields all looked relevant to employment, and therefore commute time, while also being relatively interpretable.
+
+After cleaning the data, we save an intermediate cleaned file in the data folder.
+
+```{r}
+#| label: load downloaded data
+
+source(here("source", "01_load_data.R"))
+```
+
+# Data Analysis
+
+Next, we summarize the data and run regressions to identify potential associations between these fields.
+
+

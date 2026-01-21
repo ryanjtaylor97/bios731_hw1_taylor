@@ -17,8 +17,12 @@ The analysis uses Census American Community Survey (ACS) data at the county leve
 
 *project structured using the [projectr](https://github.com/julia-wrobel/projectr) package.*
 
-## Files
+## Key Files and Folders
 
-### Data
+### Data Folder
 
-The data folder includes a folder
+* *ACSSPP1Y2024.S0201_2026-01-20T132052.zip*: the zip file downloaded directly from data.census.gov, containing the American Community Survey S0201 table from 2024.
+* *ACSSPP1Y2024.S0201_2026-01-20T132052*: a folder resulting from unzipping the zip file above.
+* *acs_clean.rda*: the intermediate file created in the script *01_load_data.R*, which is a cleaned version of the data in the ACS zip file and folder.
+
+

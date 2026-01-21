@@ -34,13 +34,12 @@ editor: source
 # Clear memory
 rm(list = ls()); gc()
 
-library(gtools)
-library(broom)
 library(tidyverse)
 library(magrittr)
-library(janitor)
-library(knitr)
 library(here)
+library(knitr)
+library(gtools)
+library(broom)
 ```
 
 # Overview
@@ -49,7 +48,7 @@ This document runs a reproducible analysis for BIOS 731 Homework 1. We download 
 
 We are interested in the demographics that may be associated with average commute time, since there are likely a wide variety of factors that may govern this part of county residents' lives. To explore this, we select a subset of fields from this table and run regressions to identify meaningful associations.
 
-# Load Data
+# Load and Clean Data
 
 First, we download data from the American Community Survey. After navigating to the S0201 table, we download the 2024 data as a zip file. This provides one csv file (with the suffix "-Data") containing the data for each county, one csv file (with the suffix "-Column-Names") containing a key translating from the column names in this data file to column descriptions, and a text file (with the suffix "-Table-Notes") providing more information on how the data were collected.
 
@@ -72,7 +71,9 @@ We read in the data and column names files, then use the column names file to id
 
 These fields all looked relevant to employment, and therefore commute time, while also being relatively interpretable. We also keep total counts that will allow us to compute weighted averages across counties when we analyze the data. However, for all fields, we exclude "margin of error" calculations for our analysis.
 
-After cleaning the data, we save an intermediate cleaned file in the data folder.
+After filtering to these variables, we also remove the first row of the data, which is the same as the second column of the "Column-Names" file. Since this row consists of all character strings, we then convert the columns except for the county ID and name into numeric variables. Finally, we extract the substring of the county name that identifies the state in which the county is located.
+
+We save the cleaned intermediate file in the data folder.
 
 ```{r}
 #| label: load downloaded data
@@ -83,5 +84,94 @@ source(here("source", "01_load_data.R"))
 # Data Analysis
 
 Next, we summarize the data and run regressions to identify potential associations between these fields.
+
+```{r}
+#| label: data analysis
+
+source(here("source", "02_analyze_data.R"))
+```
+
+## Data Summary
+
+First, we summarize the data by state to get a broader view of the data. There are 39 states represented in the data, with each state contributing between 1 and 16 counties to the data set.
+
+```{r}
+#| label: state summary
+
+kable(acs_state, caption = "State Summary", digits = 2,
+      col.names = c("State", "Counties", "Mean Commute",
+                    "Household Size",
+                    "Pct High School Educated", "Pct Bachelor's Educated",
+                    "Pct with Disability", 
+                    "Pct. Privately Employed", "Pct. Government Employed", "Pct Self-Employed", "Pct. Family Employed", 
+                    "Median Household Income", 
+                    "Median Value of Owner-Occupied Units", "Median Rent"))
+```
+
+## Univariate Regressions
+
+Next, we run univariate analyses on each of these variables to understand basic associations between the metrics and average commute time. We find that 7 of the 11 variables are significantly associated with average commute time at a significance level of $\alpha = 0.05$:
+
+* Median Rent
+* Median Value of Owner-Occupied Units
+* Median Household Income
+* Average Household Size
+* Percent of the Population with High School Education or More
+* Percent of the Population with a Disability
+* Percent of the Population Self-Employed
+
+On the other hand, the following 4 variables are not significantly associated with average commute time:
+
+* Percent of the Population Privately Employed
+* Percent of the Population with Bachelor's Degree or More
+* Percent of the Population Employed by the Government
+* Percent of the Population Employed by Unpaid Family Work
+
+These results are shown in the table below in the order above, which is in increasing order of p-value.
+
+```{r}
+#| label: univariate regressions
+
+kable(acs_reg_uni_tbl, digits = 3, 
+      caption = "Univariate Regression Results",
+      col.names = c("Variable", "Estimate", "P-Value", "Significance Level"))
+```
+
+## Multivariate Regressions
+
+Then, we run a multivariate linear regression relating average commute time to the whole set of variables that were found significant in univariate regressions. In this multivariate regression, only 3 variables were found to be associated with average commute time given the remaining variables:
+
+* Median Rent
+* Percent of the Population with High School Education or More
+* Median Value of Owner-Occupied Units
+
+```{r}
+#| label: display full reg
+
+tidy(acs_reg) %>% 
+  arrange(term != "(Intercept)", p.value) %>% 
+  mutate(p_signif = stars.pval(p.value),
+         p.value = format.pval(p.value, digits = 3, eps = 0.001)) %>% 
+  kable(caption = "Full Multivariate Regression Results",
+        digits = 3)
+```
+
+Therefore, in order to identify a sparser model, we ran stepwise selection on this model using AIC. This procedure yielded a model including the three variables above, as well as the Percent of the Population Self-Employed.
+
+These effects are shown in the table below.
+
+```{r}
+#| label: display sparse reg
+
+tidy(acs_reg_sparse) %>% 
+  arrange(term != "(Intercept)", p.value) %>% 
+  mutate(p_signif = stars.pval(p.value),
+         p.value = format.pval(p.value, digits = 3, eps = 0.001)) %>% 
+  kable(caption = "Sparse Multivariate Regression Results",
+        digits = c(0, 5, 3, 3, 0, 0))
+```
+
+# Discussion
+
 
 

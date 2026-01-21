@@ -8,6 +8,7 @@
 acs_state <- acs_df %>%
   group_by(state) %>%
   summarize(
+    n_counties = n(),
     commute = weighted.mean(commute_mean, pop_commute_total),
     hh_size = weighted.mean(hh_size_avg, hh_total),
     pop_educ_hs = weighted.mean(pop_educ_hs, pop_educ_total),

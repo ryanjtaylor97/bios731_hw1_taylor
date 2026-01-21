@@ -21,6 +21,7 @@ format:
         fig.align: center
         fig.height: 5
         fig.width: 7
+        fig.path: "../results/"
         R.options:
           scipen: 999
           knitr.kable.NA: ""
@@ -40,6 +41,7 @@ library(here)
 library(knitr)
 library(gtools)
 library(broom)
+library(corrplot)
 ```
 
 # Overview
@@ -156,7 +158,7 @@ tidy(acs_reg) %>%
         digits = 3)
 ```
 
-Therefore, in order to identify a sparser model, we ran stepwise selection on this model using AIC. This procedure yielded a model including the three variables above, as well as the Percent of the Population Self-Employed.
+In order to identify whether some of the non-significant variables in this model could be significant in a sparser model, we ran stepwise selection on this model using AIC. This procedure yielded a model including the three variables above, as well as the Percent of the Population Self-Employed.
 
 These effects are shown in the table below.
 
@@ -173,5 +175,41 @@ tidy(acs_reg_sparse) %>%
 
 # Discussion
 
+To better understand these results, we visualize the data in two ways. 
 
+```{r}
+#| label: visualizations
 
+source(here("source", "03_visualize_data.R"))
+```
+
+## Visualizations
+
+First, to understand the univariate results, we create scatterplots to illustrate how each of the variables we include in our analysis are related to average commute time.
+
+```{r}
+#| label: scatterplots
+
+acs_scatter
+```
+
+These scatterplots demonstrate that the variables that have the clearest relationships with commute time are average household size, median rent, median housing value of owner-occupied units, and median income. Other variables, such as those related to percent of the population employed by the government, private, or self-employed, show some clustering. 
+
+Based on our analyses above, not all of these variables are strongly linearly associated with commute time after conditioning on all of the other variables. To understand how these variables may be related to each other, we also create a correlation plot, which we reorder based on hierarchical clustering.
+
+```{r}
+#| label: correlation-plot
+
+corrplot(acs_corr, type = "lower", order = "hclust",
+         tl.srt = 45, cl.pos = "b")
+```
+
+Based on this correlation plot, there are several variables that are correlated with each other. Median income, median housing value, median rent, and the prevalence of Bachelor's degree education or more are all strongly positively correlated. The prevalence of high school education level is less correlated with housing values, but is correlated with income and prevalence of Bachelor's degree education. On the other hand, the prevalence of disability in a county is strongly negatively correlated with housing values, income, prevalence of a Bachelor's degree, and average household size.
+
+These correlations help explain why a variable like median income is not included in our final model, despite it having a strongly significant univariate association. Conditioned on housing values, it is likely not as strongly associated with average commute time.
+
+The only variable that was not significant in the full multivariate regression but was significant in the sparse multivariate regression was the prevalence of self-employed workers. The correlation plot shows that this metric is moderately positively correlated with average household size, housing values, and prevalence of high school education. Therefore, it is likely that its correlation with average household size was masking its association with average commute time. A sparse model excludes average household size, so the negative association between self-employment and average commute time becomes more evident.
+
+## Conclusion
+
+This analysis shows that housing prices, educational attainment, and employment class are most strongly associated with commute time. Of these, only average rent is positively associated with average commute time in a county. This may point to the population density of each county, which could increase both rent price and traffic. Prevalence of high school education, median owner-occupied unit housing value, and prevalence of self-employment are all negatively associated with average commute time. These results are somewhat intuitive: education may allow residents to find employment closer to where they live, self-employment likely involves short commutes, and higher housing value may indicate that residents live closer to an economic hub. However, the univariate association between housing value and commute time was positive, so there could also be an interaction between median owner-occupied housing value and median rent.

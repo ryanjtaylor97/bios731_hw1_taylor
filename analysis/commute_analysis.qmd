@@ -1,7 +1,8 @@
 ---
-title: "BIOS 731 Homework 1 Commute Analysis"
+title: "BIOS 731 HW 1 Commute Analysis"
 format: 
   html:
+    embed-resources: true
     toc: true
     toc-depth: 2
     toc-title: Contents
@@ -46,7 +47,7 @@ library(corrplot)
 
 # Overview
 
-This document runs a reproducible analysis for BIOS 731 Homework 1. We download data from the American Community Survey S0201 table at [data.census.gov] <https://data.census.gov/table/ACSSPP1Y2024.S0201?t=Commuting:Education&g=010XX00US$0500000&moe=false&tp=true&tableFilters=ag-Grid-AutoColumn~(Margin+of+Errorundefined)>. This table provides county-level demographics for a selection of counties across the United States, including information such as total population, total population with a disability, median household income, and average commute time to work. 
+This document runs a reproducible analysis for BIOS 731 Homework 1. We download data from the American Community Survey S0201 table at [data.census.gov](https://data.census.gov/table/ACSSPP1Y2024.S0201?t=Commuting:Education&g=010XX00US$0500000&moe=false&tp=true&tableFilters=ag-Grid-AutoColumn~(Margin+of+Errorundefined)). This table provides county-level demographics for a selection of counties across the United States, including information such as total population, total population with a disability, median household income, and average commute time to work. 
 
 We are interested in the demographics that may be associated with average commute time, since there are likely a wide variety of factors that may govern this part of county residents' lives. To explore this, we select a subset of fields from this table and run regressions to identify meaningful associations.
 
@@ -60,7 +61,7 @@ We read in the data and column names files, then use the column names file to id
 * Average Household Size
 * Percent of population 25 and over with educated high school degree or greater
 * Percent of population 25 and over educated with Bachelor's degree or greater
-* Percent of civilian noninstitutionalized population with a disability
+* Percent of civilian non-institutionalized population with a disability
 * Average commute time (in minutes)
 * Percent of civilian employed population 16 and over who are employed as private wage and salary workers
 * Percent of civilian employed population 16 and over who are employed as government workers
@@ -100,6 +101,7 @@ First, we summarize the data by state to get a broader view of the data. There a
 ```{r}
 #| label: state summary
 
+# Print table of state summaries
 kable(acs_state, caption = "State Summary", digits = 2,
       col.names = c("State", "Counties", "Mean Commute",
                     "Household Size",
@@ -150,6 +152,7 @@ Then, we run a multivariate linear regression relating average commute time to t
 ```{r}
 #| label: display full reg
 
+# Print clean table of regression results
 tidy(acs_reg) %>% 
   arrange(term != "(Intercept)", p.value) %>% 
   mutate(p_signif = stars.pval(p.value),
@@ -165,6 +168,7 @@ These effects are shown in the table below.
 ```{r}
 #| label: display sparse reg
 
+# Print clean table of sparse regression results
 tidy(acs_reg_sparse) %>% 
   arrange(term != "(Intercept)", p.value) %>% 
   mutate(p_signif = stars.pval(p.value),
